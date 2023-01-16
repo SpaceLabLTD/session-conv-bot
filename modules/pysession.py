@@ -40,6 +40,7 @@ class Session:
         is_bot: int = None,
         dc_id: int = None,
         test_mode: int = None,
+        app_id: int = None,
     ):
         self._auth_key = auth_key
         self._server_adderss = server_address
@@ -47,6 +48,7 @@ class Session:
         self._user_id = user_id
         self._is_bot = is_bot
         self._dc_id = dc_id
+        self._api_id = app_id
         self._test_mode = test_mode
         self._takeout_id = None  # Not required for pyrogram or telethon
         self._loaded = False
@@ -148,33 +150,63 @@ class Session:
         finally:
             return self._loaded
 
-    async def load_pyrogram_session(self, session: str):
+    async def load_pyrogram_session(self, session: str, v2: bool = False):
         try:
-            if len(session) < 251 and os.path.exists(session):
-                conn = sqlite3.connect(session, check_same_thread=False)
-                (
-                    self._dc_id,
-                    self._test_mode,
-                    self._auth_key,
-                    self._date,
-                    self._user_id,
-                    self._is_bot,
-                ) = conn.execute("select * from sessions").fetchone()
-                self._loaded = True
-                conn.close()
+            if v2:
+                if len(session) < 251 and os.path.exists(session):
+                    conn = sqlite3.connect(session, check_same_thread=False)
+                    (
+                        self._dc_id,
+                        self._api_id,
+                        self._test_mode,
+                        self._auth_key,
+                        self._date,
+                        self._user_id,
+                        self._is_bot,
+                    ) = conn.execute("select * from sessions").fetchone()
+                    self._loaded = True
+                    conn.close()
 
-            elif not os.path.exists(session):
-                (
-                    self._dc_id,
-                    self._test_mode,
-                    self._auth_key,
-                    self._user_id,
-                    self._is_bot,
-                ) = struct.unpack(
-                    ">B?256sI?",
-                    base64.urlsafe_b64decode(session + "=" * (-len(session) % 4)),
-                )
-                self._loaded = True
+                elif not os.path.exists(session):
+                    (
+                        self._dc_id,
+                        self._api_id,
+                        self._test_mode,
+                        self._auth_key,
+                        self._user_id,
+                        self._is_bot,
+                    ) = struct.unpack(
+                        ">BI?256sQ?",
+                        base64.urlsafe_b64decode(session + "=" * (-len(session) % 4)),
+                    )
+                    self._loaded = True
+
+            else:
+                if len(session) < 251 and os.path.exists(session):
+                    conn = sqlite3.connect(session, check_same_thread=False)
+                    (
+                        self._dc_id,
+                        self._test_mode,
+                        self._auth_key,
+                        self._date,
+                        self._user_id,
+                        self._is_bot,
+                    ) = conn.execute("select * from sessions").fetchone()
+                    self._loaded = True
+                    conn.close()
+
+                elif not os.path.exists(session):
+                    (
+                        self._dc_id,
+                        self._test_mode,
+                        self._auth_key,
+                        self._user_id,
+                        self._is_bot,
+                    ) = struct.unpack(
+                        ">B?256sI?",
+                        base64.urlsafe_b64decode(session + "=" * (-len(session) % 4)),
+                    )
+                    self._loaded = True
 
         finally:
             return self._loaded
