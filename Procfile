@@ -1,1 +1,1 @@
-worker: python main.py
+telegram: python3 main.py

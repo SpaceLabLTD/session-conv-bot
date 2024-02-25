@@ -1,0 +1,27 @@
+[tool.poetry]
+name = "tgsessionrobot"
+version = "1.0.0"
+description = "A Telegram Bot for convert and generate string session or sqlite session file."
+authors = ["Md. Hasibul Kabir <46620128+HasibulKabir@users.noreply.github.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.8"
+python-dotenv = "^1.0.1"
+aiogram = "^3.4.1"
+aiohttp = "^3.9.0"
+fluxsession = "0.1.4"
+
+
+[tool.poetry.group.dev.dependencies]
+black = { version = "^22.10.0", allow-prereleases = true }
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.ruff]
+line-length = 100
+fix = true
+select = ["ALL"]
+ignore = ["D", "ANN", "RET"]

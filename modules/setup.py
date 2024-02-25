@@ -21,21 +21,13 @@
 # SOFTWARE.
 
 
-from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup, Message
+from aiogram import Dispatcher
+from aiogram.filters import Command
+
+from .server import event_router
+from .start import start_command_handler
 
 
-async def start_command_handler(message: Message):
-    await message.reply(
-        "Welcome 💖. This is session converter bot. "
-        "Send me a session string to convert it to a session file.",
-        reply_markup=InlineKeyboardMarkup(
-            inline_keyboard=[
-                [
-                    InlineKeyboardButton(
-                        text="Source Code 😍",
-                        url="https://github.com/SpaceLabLTD/session-conv-bot",
-                    ),
-                ],
-            ],
-        ),
-    )
+async def setup(dp: Dispatcher):
+    dp.message.register(start_command_handler, Command("start"))
+    dp.include_router(event_router)
